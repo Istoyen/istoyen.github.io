@@ -1,0 +1,5 @@
+{
+ "name": "Healthcare Analytics Portfolio",
+ "dataColors": ["#086A64", "#629C8F", "#CC6C3B", "#153943", "#A8CFC1", "#9C825D"],
+ "background": "#F6F7F3", "foreground": "#172D35", "tableAccent": "#086A64"
+}

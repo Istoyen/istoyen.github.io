@@ -1,0 +1,13 @@
+payer,program,raw_rows,flagged_rows,clean_rows,duplicate_excess_rows,orphan_rows,invalid_date_rows,invalid_supply_rows,invalid_quantity_rows
+Commercial,Immunology,157,21,136,4,4,5,4,4
+Commercial,Neurology,169,21,148,10,3,2,2,4
+Commercial,Oncology,145,20,125,7,0,2,4,7
+Medicaid,Immunology,123,16,107,5,4,3,1,3
+Medicaid,Neurology,130,19,111,2,6,1,3,7
+Medicaid,Oncology,133,18,115,6,4,1,3,6
+Medicare,Immunology,134,15,119,6,2,2,0,5
+Medicare,Neurology,130,18,112,2,3,4,4,5
+Medicare,Oncology,170,22,148,6,6,5,3,3
+Uninsured,Immunology,177,26,151,6,4,3,9,5
+Uninsured,Neurology,166,22,144,4,5,3,5,5
+Uninsured,Oncology,142,14,128,4,6,3,1,1

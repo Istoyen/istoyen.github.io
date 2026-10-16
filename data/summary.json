@@ -1,0 +1,11 @@
+{
+  "as_of": "2026-07-01",
+  "cases": 1200,
+  "started": 975,
+  "conversion": 81.3,
+  "pending": 82,
+  "median_days": 16,
+  "raw_shipments": 1776,
+  "flagged_rows": 232,
+  "clean_shipments": 1544
+}

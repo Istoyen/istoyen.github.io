@@ -1,0 +1,12 @@
+// Create each calculated table separately using Modeling > New table.
+DimPayer = DISTINCT(UNION(SELECTCOLUMNS(Cases, "payer", Cases[payer]), SELECTCOLUMNS(ShipmentQuality, "payer", ShipmentQuality[payer])))
+
+DimProgram = DISTINCT(UNION(SELECTCOLUMNS(Cases, "program", Cases[program]), SELECTCOLUMNS(ShipmentQuality, "program", ShipmentQuality[program])))
+
+AccessStage = DATATABLE("Stage", STRING, "Order", INTEGER, {{"Received",1},{"Intake complete",2},{"Verified",3},{"Approved",4},{"Paid start",5}})
+
+QualityReason = DATATABLE("Reason", STRING, "Order", INTEGER, {{"Duplicates",1},{"Orphan cases",2},{"Invalid dates",3},{"Days supply",4},{"Quantity",5}})
+
+ProcessStage = DATATABLE("Stage", STRING, "Order", INTEGER, {{"Intake",1},{"Verification",2},{"Approval",3},{"Fulfillment",4}})
+
+AgeBand = DATATABLE("Band", STRING, "Order", INTEGER, {{"0–7 days",1},{"8–14 days",2},{"15–30 days",3},{"31+ days",4}})

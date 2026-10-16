@@ -1,0 +1,60 @@
+// Add each measure separately. Format percentages as 0.0%; days as 0.0; counts as #,0.
+Referrals = COUNTROWS(Cases)
+
+Paid Starts = CALCULATE(COUNTROWS(Cases), KEEPFILTERS(Cases[status] = "Started"))
+
+Snapshot Start Rate = DIVIDE([Paid Starts], [Referrals])
+
+Pending Cases = CALCULATE(COUNTROWS(Cases), KEEPFILTERS(Cases[status] = "Pending"))
+
+Closed Cases = CALCULATE(COUNTROWS(Cases), KEEPFILTERS(Cases[status] = "Closed"))
+
+Stage Cases = SWITCH(SELECTEDVALUE(AccessStage[Stage]),
+ "Received", [Referrals],
+ "Intake complete", COUNTROWS(FILTER(Cases, NOT ISBLANK(Cases[complete_date]))),
+ "Verified", COUNTROWS(FILTER(Cases, NOT ISBLANK(Cases[verified_date]))),
+ "Approved", COUNTROWS(FILTER(Cases, NOT ISBLANK(Cases[approved_date]))),
+ "Paid start", [Paid Starts])
+
+Median Paid Start Days = MEDIANX(FILTER(Cases, Cases[status] = "Started" && NOT ISBLANK(Cases[days_to_start])), Cases[days_to_start])
+
+P90 Paid Start Days = PERCENTILEX.INC(FILTER(Cases, Cases[status] = "Started" && NOT ISBLANK(Cases[days_to_start])), Cases[days_to_start], 0.9)
+
+Completed Within 14 Days Rate = DIVIDE(COUNTROWS(FILTER(Cases, Cases[status] = "Started" && NOT ISBLANK(Cases[days_to_start]) && Cases[days_to_start] <= 14)), [Paid Starts])
+
+Pending Over 14 Days = COUNTROWS(FILTER(Cases, Cases[status] = "Pending" && Cases[pending_age_days] > 14))
+
+Median Bridge Days = MEDIANX(FILTER(Cases, NOT ISBLANK(Cases[bridge_days])), Cases[bridge_days])
+
+Open Bridge Requests = COUNTROWS(FILTER(Cases, NOT ISBLANK(Cases[bridge_requested_date]) && ISBLANK(Cases[bridge_dispensed_date])))
+
+Mean Stage Days = VAR Completed = FILTER(Cases, Cases[status] = "Started")
+RETURN SWITCH(SELECTEDVALUE(ProcessStage[Stage]),
+ "Intake", AVERAGEX(Completed, Cases[intake_days]),
+ "Verification", AVERAGEX(Completed, Cases[verification_days]),
+ "Approval", AVERAGEX(Completed, Cases[approval_days]),
+ "Fulfillment", AVERAGEX(Completed, Cases[fulfillment_days]))
+
+Pending Age Count = VAR Band = SELECTEDVALUE(AgeBand[Band])
+RETURN COUNTROWS(FILTER(Cases, Cases[status] = "Pending" && SWITCH(Band,
+ "0–7 days", Cases[pending_age_days] <= 7,
+ "8–14 days", Cases[pending_age_days] > 7 && Cases[pending_age_days] <= 14,
+ "15–30 days", Cases[pending_age_days] > 14 && Cases[pending_age_days] <= 30,
+ "31+ days", Cases[pending_age_days] > 30, FALSE())))
+
+Raw Shipment Rows = COUNTROWS(ShipmentQuality)
+
+Flagged Rows = CALCULATE(COUNTROWS(ShipmentQuality), KEEPFILTERS(ShipmentQuality[is_flagged] = 1))
+
+Accepted Shipments = CALCULATE(COUNTROWS(ShipmentQuality), KEEPFILTERS(ShipmentQuality[is_flagged] = 0))
+
+Flagged Rate = DIVIDE([Flagged Rows], [Raw Shipment Rows])
+
+Reconciliation Difference = [Raw Shipment Rows] - [Flagged Rows] - [Accepted Shipments]
+
+Exception Count = SWITCH(SELECTEDVALUE(QualityReason[Reason]),
+ "Duplicates", SUM(ShipmentQuality[duplicate_flag]),
+ "Orphan cases", SUM(ShipmentQuality[orphan_flag]),
+ "Invalid dates", SUM(ShipmentQuality[date_flag]),
+ "Days supply", SUM(ShipmentQuality[supply_flag]),
+ "Quantity", SUM(ShipmentQuality[quantity_flag]))
